@@ -1,6 +1,5 @@
 const { createPool } = require("mysql2");
 const express = require("express");
-//const cors = require("cors");
 
 const bodyParser = require("body-parser");
 const res = require("express/lib/response");
@@ -21,20 +20,6 @@ const pool = createPool({
   database: "test",
   connectionLimit: 10,
 });
-
-// pool.query("INSERT INTO users VALUES (2,'rajput','yash')",(err,result,fields)=>{
-//     if(err){
-//         return console.log(err);
-//     }
-//     return console.log(result);
-// })
-
-// pool.query("SELECT * FROM users",(err,result,fields)=>{
-//     if(err){
-//         return console.log(err);
-//     }
-//     return console.log(result);
-// })
 
 app.get("/", function (req, res) {
   res.sendFile("index.html", { root: __dirname });
@@ -83,7 +68,7 @@ app.post("/register", (req, res) => {
                           if (err) console.log(err);
                           else {
                             console.log(result);
-                            res.render('signup', { title: 'Logged in', user: userName });
+                            res.render('signup', { title: 'Logged in', user: userName, first: firstName, last: lastName, email: eMail, mobile: mobileNumber });
                           }
                         }
                       );
@@ -98,17 +83,6 @@ app.post("/register", (req, res) => {
         }
       }
     });
-  // pool.query(
-  //   "INSERT INTO users (firstName,lastName,userName,password,confirmPassword,email,mobile) VALUES (?,?,?,?,?,?,?)",
-  //   [firstName, lastName, userName, passWord, conPassWord, eMail, mobileNumber],
-  //   (err, result) => {
-  //     if (err) console.log(err);
-  //     else {
-  //       console.log(result);
-  //       res.render('signup',{title:'Logged in', user:userName});
-  //     }
-  //   }
-  // );
 });
 
 app.get("/login", (req, res) => {
@@ -132,10 +106,10 @@ app.post("/login", (req, res) => {
     (err, row, fields) => {
       if (err) console.log(err);
       else {
-        if(row.length>0){
+        if (row.length > 0) {
           bcrypt.compare(PassWord, row[0].password, (error, response) => {
             if (response) {
-              res.render('login', { title: 'Logged in', user: UserName });
+              res.render('login', { title: 'Logged in', user: UserName, first: row[0].firstName, last: row[0].lastName, email: row[0].email, mobile: row[0].mobile });
             } else {
               res.send({ message: "Wrong username/password combination!" });
             }
@@ -146,41 +120,7 @@ app.post("/login", (req, res) => {
       }
     }
   );
-  // if (req.session.user) {
-  //   res.send({ loggedIn: true, user: req.session.user });
-  // } else {
-  //   res.send({ loggedIn: false });
-  // }
 });
-
-// app.post("/submit", (req, res) => {
-//   const username = req.body.username;
-//   const password = req.body.password;
-
-//   db.query(
-//     "SELECT * FROM users WHERE username = ?;",
-//     username,
-//     (err, result) => {
-//       if (err) {
-//         res.send({ err: err });
-//       }
-
-//       if (result.length > 0) {
-//         bcrypt.compare(password, result[0].password, (error, response) => {
-//           if (response) {
-//             req.session.user = result;
-//             console.log(req.session.user);
-//             res.send(result);
-//           } else {
-//             res.send({ message: "Wrong username/password combination!" });
-//           }
-//         });
-//       } else {
-//         res.send({ message: "User doesn't exist" });
-//       }
-//     }
-//   );
-// });
 
 app.listen(3000, () => {
   console.log("running server");
