@@ -132,8 +132,17 @@ app.post("/login", (req, res) => {
     (err, row, fields) => {
       if (err) console.log(err);
       else {
-        console.log(row);
-        res.render('login', { title: 'Logged in', user: UserName });
+        if(row.length>0){
+          bcrypt.compare(PassWord, row[0].password, (error, response) => {
+            if (response) {
+              res.render('login', { title: 'Logged in', user: UserName });
+            } else {
+              res.send({ message: "Wrong username/password combination!" });
+            }
+          });
+        } else {
+          res.send({ message: "User doesn't exist" });
+        }
       }
     }
   );
